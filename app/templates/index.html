@@ -1,54 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Art Fest Results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-
 <body>
-    <form id="result-form">
-        <label for="class-section">Class Section</label>
-        <select id="class-section" name="class-section">
-            <option value="bidaya">Bidaya</option>
-            <option value="ula">Ula</option>
-            <!-- Add other sections -->
+    <h1>Art Fest Results</h1>
+    <form id="resultForm">
+        <select id="classSection">
+            <option value="bidaya">1 (Bidaya)</option>
+            <option value="ula">2-3 (Ula)</option>
+            <option value="taniyah">4-5 (Taniyah)</option>
+            <option value="tanawiyyah">6-7 (Tanawiyyah)</option>
+            <option value="aliah">8-10 (Aliah)</option>
+            <option value="kulliyyah">1-10 (Kulliyyah)</option>
         </select>
-
-        <label for="program-section">Program Section</label>
-        <select id="program-section" name="program-section">
+        <select id="programSection">
             <option value="sports">Sports</option>
             <option value="stage">Stage</option>
-            <!-- Add other sections -->
+            <option value="non-stage">Non-Stage</option>
         </select>
-
-        <label for="program">Program</label>
-        <select id="program" name="program">
-            <!-- Programs will be populated here -->
-        </select>
-
-        <div id="entries">
-            <div class="entry">
-                <label for="reg-no">Reg No</label>
-                <input type="number" id="reg-no" name="reg-no" min="1" max="9999">
-                <p id="student-name">Name: </p>
-                <p id="team-name">Team: </p>
-                <label for="grade">Grade</label>
-                <select id="grade" name="grade">
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="-">-</option>
-                </select>
-                <p id="score">Score: </p>
-            </div>
-        </div>
-        <button type="button" id="add-entry">Add Entry</button>
+        <select id="program"></select>
+        <div id="entries"></div>
+        <button type="button" id="addEntry">Add Entry</button>
         <button type="submit">Submit</button>
     </form>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+    <script>
+        $(document).ready(function() {
+            // Fetch programs when class section or program section changes
+            $('#classSection, #programSection').change(function() {
+                $.post('/get_programs', {
+                    class_section: $('#classSection').val(),
+                    program_section: $('#programSection').val()
+                }, function(data) {
+                    $('#program').empty();
+                    data.forEach(function(program) {
+                        $('#program').append($('<option></option>').attr('value', program.id).text(program.name));
+                    });
+                });
+            });
 
+            // Add entry
+            $('#addEntry').click(function() {
+                let entryCount = $('#entries .entry').length + 1;
+                let entry = $('<div class="entry"></div>');
+                entry.append('<input type="number" class="regNo" min="1000" max="9999" required>');
+                entry.append('<p class="studentName"></p>');
+                entry.append('<p class="teamName"></p>');
+                if (entryCount <= 3) {
+                    entry.append('<select class="grade"><option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option></select>');
+                } else {
+                    entry.append('<select class="grade"><option value="A">A</option><option value="B">B</option><option value="-">-</option></select>');
+                }
+                entry.append('<p class="score"></p>');
+                $('#entries').append(entry);
+            });
+
+            // Fetch student details when reg no is entered
+            $(document).on('change', '.regNo', function() {
+                let regNo = $(this).val();
+                let entry = $(this).closest('.entry');
+                $.post('/get_student', {reg_no: regNo}, function(data) {
+                    entry.find('.studentName').text(data.name);
+                    entry.find('.teamName').text(data.team);
+                });
+            });
+
+            // Calculate score when grade changes
+            $(document).on('change', '.grade', function() {
+                let entry = $(this).closest('.entry');
+                let grade = $(this).val();
+                let isKulliyyah = $('#classSection').val() === 'kulliyyah';
+                let score = 0;
+                if (isKulliyyah) {
+                    score = grade === '1' ? 10 : grade === '2' ? 7 : grade === '3' ? 5 : grade === 'A' ? 5 : grade === 'B' ? 3 : 0;
+                } else {
+                    score = grade === '1' ? 5 : grade === '2' ? 3 : grade === '3' ? 1 : grade === 'A' ? 5 : grade === 'B' ? 3 : 0;
+                }
+                entry.find('.score').text(score);
+            });
+
+            // Form submission
+            $('#resultForm').submit(function(e) {
+                e.preventDefault();
+                // Here you would typically send the data to the server
+                console.log('Form submitted');
+            });
+        });
+    </script>
+</body>
 </html>

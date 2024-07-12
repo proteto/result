@@ -1,0 +1,20 @@
+[
+    {
+      "id": "1",
+      "name": "100m Sprint",
+      "class_section": "bidaya",
+      "program_section": "sports"
+    },
+    {
+      "id": "2",
+      "name": "Debate",
+      "class_section": "ula",
+      "program_section": "stage"
+    },
+    {
+      "id": "3",
+      "name": "Essay Writing",
+      "class_section": "taniyah",
+      "program_section": "non-stage"
+    }
+  ]

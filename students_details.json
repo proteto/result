@@ -1,0 +1,17 @@
+[
+    {
+      "reg_no": "1001",
+      "name": "John Doe",
+      "team": "Red Team"
+    },
+    {
+      "reg_no": "1002",
+      "name": "Jane Smith",
+      "team": "Blue Team"
+    },
+    {
+      "reg_no": "1003",
+      "name": "Alice Johnson",
+      "team": "Green Team"
+    }
+  ]
