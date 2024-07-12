@@ -1,0 +1,4 @@
+[
+    {"reg_no": "0001", "name": "John Doe", "team": "Team A", "class": 1},
+    {"reg_no": "0002", "name": "Jane Smith", "team": "Team B", "class": 2}
+]
